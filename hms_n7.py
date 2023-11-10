@@ -6,6 +6,7 @@ from tkinter import ttk  # for tree
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import re
+from tkcalendar import Calendar
 
 
 # Maximum appointments per doctor
@@ -16,6 +17,7 @@ MAX_APPOINTMENTS_PER_DOCTOR = 20  # You can adjust this value as needed
 search_date_entry = None
 search_time_var = None
 search_doctor_var = None
+date_entry = None
 
 doctor_appointments = {}  # Dictionary to store doctor appointments and their counts
 
@@ -355,6 +357,7 @@ appointments = {}
 def appointment_window():
     # Create an appointment frame within the main window
     global appointment_window  # Declare the appointment_window as global
+    global date_entry
     global appointments  # Declare appointments as global
     appointment_window = tk.Toplevel(root)
     appointment_window.geometry("700x500")
@@ -374,6 +377,7 @@ def appointment_window():
 
     def schedule_appointment():
         global appointments
+        global date_entry
         patient_name = name_entry.get()
         age = age_entry.get()
         contact_number = contact_entry.get()
@@ -498,9 +502,9 @@ def appointment_window():
     slot_option_menu = tk.OptionMenu(appointment_window, slot_var, *doctors[doctor_var.get()])
     slot_option_menu.pack()
 
-    date_label = tk.Label(appointment_window, text="Appointment Date (e.g., 2023-01-01):")
+    date_label = tk.Label(appointment_window, text="Appointment Date:")
+    date_entry = Calendar(appointment_window, date_pattern='yyyy-mm-dd')
     date_label.pack()
-    date_entry = tk.Entry(appointment_window)
     date_entry.pack()
 
     schedule_button = tk.Button(appointment_window, text="Schedule Appointment and Print Summary", command=schedule_appointment)
@@ -559,7 +563,7 @@ def generate_pdf_report(appointment_info):
 # Function to handle the "Print as PDF" button click
     def print_as_pdf():
         generate_pdf_report(appointment_info)
-        messagebox.showinfo("PDF Generated", "Appointment summary PDF generated successfully!")
+        messagebox.showinfo("PDF Generated.", "Appointment summary PDF generated successfully!")
 
 # Function to display appointment summary
 def show_appointment_summary(appointment_info):
@@ -584,6 +588,10 @@ def show_appointment_summary(appointment_info):
 
     # Generate a PDF report for the appointment
     generate_pdf_report(appointment_info)
+
+    # Create a button to generate PDF
+    pdf_button = tk.Button(summary_window, text="Generate PDF", command=lambda: generate_pdf_report(appointment_info))
+    pdf_button.pack()
 
     # Close the appointment window after displaying the summary
     appointment_window.destroy()
